@@ -1,0 +1,39 @@
+.tab-active {
+	border-bottom: 3px solid #3b82f6;
+	color: #2563eb;
+	font-weight: 600;
+}
+
+.tab-inactive {
+	color: #6b7280;
+	font-weight: 500;
+}
+
+.tab-inactive:hover {
+	color: #3b82f6;
+}
+
+.tab-content {
+	display: none;
+}
+
+.tab-content.active {
+	display: block;
+}
+
+#historyList {
+	max-height: none;
+	overflow-y: visible;
+}
+
+/* Smooth card transitions */
+.history-card {
+	transition: all 0.3s ease;
+}
+
+.history-card:hover {
+	transform: translateY(-2px);
+	box-shadow:
+		0 4px 6px -1px rgba(0, 0, 0, 0.1),
+		0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}

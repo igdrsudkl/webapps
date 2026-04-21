@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Buku Utang Farmasi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="assets/.css">
+</head>
+
+<body class="text-gray-800">
+    <!-- HEADER -->
+    <header class="bg-gradient-to-r from-blue-800 to-blue-500 text-white p-4 shadow-md">
+        <div class="flex items-center gap-3">
+            <div class="text-2xl">🏥</div>
+            <div>
+                <h1 class="text-lg font-semibold">Buku Utang Farmasi RSUD KL</h1>
+                <p id="nowDateTime" class="text-sm opacity-90"></p>
+            </div>
+        </div>
+    </header>
+
+    <!-- TAB NAVIGATION -->
+    <nav class="bg-white shadow-sm px-4 border-b border-gray-200">
+        <div class="flex justify-center gap-8" id="tabButtons">
+            <button onclick="switchTab('form')" id="tabFormBtn" class="py-3 px-6 transition-all duration-300 tab-active">
+                Form Peminjaman
+            </button>
+            <button onclick="switchTab('history')" id="tabHistoryBtn" class="py-3 px-6 transition-all duration-300 tab-inactive">
+                Riwayat Pinjam
+            </button>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- TAB 1: Form Peminjaman -->
+        <div id="formTab" class="tab-content active">
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Form Input -->
+                <div class="w-full lg:w-2/3 mx-auto">
+                    <div class="form-container p-6 mb-8 w-full max-w-3xl mx-auto bg-white rounded-xl shadow-lg">
+                        <div class="header-gradient bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-t-xl p-4 -mx-6 -mt-6 mb-6">
+                            <h2 class="text-lg font-bold"><i class="fas fa-file-medical mr-2"></i>Form Peminjaman Alkes</h2>
+                        </div>
+
+                        <form id="loanForm">
+                            <!-- Tanggal Transaksi -->
+                            <div class="mb-6">
+                                <label for="transactionDate" class="block text-gray-700 font-medium mb-2">
+                                    <i class="fas fa-calendar-day mr-2 text-blue-500"></i>Tanggal Transaksi
+                                </label>
+                                <div class="flex items-center">
+                                    <input type="date" id="transactionDate"
+                                        class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        required>
+                                    <button type="button" id="resetDate"
+                                        class="ml-3 px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Nama Pasien -->
+                            <div class="mb-6">
+                                <label for="patientName" class="block text-gray-700 font-medium mb-2">
+                                    <i class="fas fa-user-injured mr-2 text-blue-500"></i>Nama Pasien
+                                </label>
+                                <input type="text" id="patientName" name="patientName"
+                                    class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Masukkan nama pasien" autocomplete="name" required>
+                            </div>
+
+                            <!-- Nama Petugas -->
+                            <div class="mb-8">
+                                <label for="staffName" class="block text-gray-700 font-medium mb-2">
+                                    <i class="fas fa-user-nurse mr-2 text-blue-500"></i>Nama Petugas
+                                </label>
+                                <input type="text" id="staffName" name="staffName"
+                                    class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Masukkan nama petugas" autocomplete="name" required>
+                            </div>
+
+                            <!-- Unit -->
+                            <div class="mb-6">
+                                <label for="selectedUnit" class="block text-gray-700 font-medium mb-3">
+                                    <i class="fas fa-hospital mr-2 text-blue-500"></i>Unit
+                                </label>
+                                <div class="custom-select">
+                                    <select id="selectedUnit" name="unit"
+                                        class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">-- Pilih Unit --</option>
+                                        <option value="IGD">IGD</option>
+                                        <option value="Rawat Jalan">Rawat Jalan</option>
+                                        <option value="Rawat Inap">Rawat Inap</option>
+                                        <option value="ICU">ICU</option>
+                                        <option value="Perina/PICU/NICU">Perina/PICU/NICU</option>
+                                        <option value="VK">VK</option>
+                                        <option value="OK">OK</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Paket Alkes -->
+                            <div class="mb-6">
+                                <label for="packageInput" class="block text-gray-700 font-medium mb-2">
+                                    <i class="fas fa-boxes mr-2 text-blue-500"></i>Paket Alkes (Opsional)
+                                </label>
+                                <div class="relative">
+                                    <input type="text" id="packageInput" placeholder="Ketik atau pilih paket..."
+                                        autocomplete="off"
+                                        class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <div id="packageSuggestions"
+                                        class="absolute z-10 w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-1 hidden max-h-60 overflow-y-auto">
+                                    </div>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-1">Pilih paket untuk menambahkan item alkes secara otomatis</p>
+                            </div>
+
+                            <!-- Daftar Alkes Dinamis -->
+                            <div class="mb-8">
+                                <div class="flex justify-between items-center mb-4">
+                                    <label class="block text-gray-700 font-medium">
+                                        <i class="fas fa-tools mr-2 text-blue-500"></i>Daftar Alkes
+                                    </label>
+                                    <button type="button" id="addAlkes"
+                                        class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition">
+                                        <i class="fas fa-plus mr-2"></i>Tambah Alkes
+                                    </button>
+                                </div>
+
+                                <div id="alkesContainer">
+                                    <!-- Baris alkes akan dibuat secara dinamis oleh JavaScript -->
+                                </div>
+                            </div>
+
+                            <!-- Tombol Aksi -->
+                            <div class="flex flex-col md:flex-row gap-4 pt-4 border-t border-gray-200">
+                                <button type="submit"
+                                    class="flex-1 px-6 py-4 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-bold text-lg transition">
+                                    <i class="fas fa-save mr-2"></i>Simpan Transaksi
+                                </button>
+                                <button type="button" id="resetForm"
+                                    class="flex-1 px-6 py-4 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-bold text-lg transition">
+                                    <i class="fas fa-redo mr-2"></i>Reset Form
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Panel Informasi -->
+                <div class="lg:w-1/3">
+                    <div class="bg-white rounded-xl shadow-lg p-6 mb-8 sticky top-4">
+                        <div class="bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-t-xl p-4 -mx-6 -mt-6 mb-6">
+                            <h2 class="text-lg font-bold"><i class="fas fa-info-circle mr-2"></i>Informasi Transaksi</h2>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="flex items-center p-3 bg-blue-50 rounded-lg">
+                                <i class="fas fa-calendar-check text-blue-500 text-xl mr-3"></i>
+                                <div>
+                                    <p class="text-sm text-gray-600">Tanggal Transaksi</p>
+                                    <p id="infoDate" class="font-medium">-</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center p-3 bg-green-50 rounded-lg">
+                                <i class="fas fa-user-injured text-green-500 text-xl mr-3"></i>
+                                <div>
+                                    <p class="text-sm text-gray-600">Nama Pasien</p>
+                                    <p id="infoPatient" class="font-medium">-</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center p-3 bg-purple-50 rounded-lg">
+                                <i class="fas fa-user-nurse text-purple-500 text-xl mr-3"></i>
+                                <div>
+                                    <p class="text-sm text-gray-600">Nama Petugas</p>
+                                    <p id="infoStaff" class="font-medium">-</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center p-3 bg-orange-50 rounded-lg">
+                                <i class="fas fa-hospital text-orange-500 text-xl mr-3"></i>
+                                <div>
+                                    <p class="text-sm text-gray-600">Unit</p>
+                                    <p id="infoUnit" class="font-medium">-</p>
+                                </div>
+                            </div>
+
+                            <div class="p-3 bg-gray-50 rounded-lg">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-tools text-gray-500 text-xl mr-3"></i>
+                                    <p class="text-sm text-gray-600">Item Alkes Dipinjam</p>
+                                </div>
+                                <ul id="infoAlkes" class="space-y-2 max-h-60 overflow-y-auto">
+                                    <li class="text-gray-500 italic">Belum ada data</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: Riwayat Peminjaman -->
+        <div id="historyTab" class="tab-content">
+            <div class="max-w-5xl mx-auto">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-t-xl p-4 -mx-6 -mt-6 mb-6">
+                        <h2 class="text-lg font-bold"><i class="fas fa-history mr-2"></i>Riwayat Peminjaman Alkes</h2>
+                        <p class="text-sm opacity-90 mt-1">Semua transaksi peminjaman alat kesehatan</p>
+                    </div>
+
+                    <div id="historyList" class="space-y-4 max-h-[600px] overflow-y-auto">
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-clipboard-list text-3xl mb-3"></i>
+                            <p>Belum ada transaksi</p>
+                            <p class="text-sm">Data otomatis ditarik dari Google Sheet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <footer class="mt-12 pt-6 border-t border-gray-300 text-center text-gray-600">
+            <p class="mb-2">Aplikasi Buku Utang Farmasi &copy; <span id="year"></span></p>
+            <p class="text-sm">Created by M Yudhi Akbar</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // ===== TAB SWITCH FUNCTION =====
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(`${tabName}Tab`).classList.add('active');
+            
+            // Update button styles
+            const formBtn = document.getElementById('tabFormBtn');
+            const historyBtn = document.getElementById('tabHistoryBtn');
+            
+            if (tabName === 'form') {
+                formBtn.classList.remove('tab-inactive');
+                formBtn.classList.add('tab-active');
+                historyBtn.classList.remove('tab-active');
+                historyBtn.classList.add('tab-inactive');
+            } else {
+                historyBtn.classList.remove('tab-inactive');
+                historyBtn.classList.add('tab-active');
+                formBtn.classList.remove('tab-active');
+                formBtn.classList.add('tab-inactive');
+                // Refresh history when switching to history tab
+                loadHistory();
+            }
+        }
+
+        // ===== FORMAT TANGGAL =====
+        function updateNowDateTime() {
+            const el = document.getElementById("nowDateTime");
+            if (!el) return;
+
+            el.textContent =
+                new Date().toLocaleString("id-ID", {
+                    timeZone: "Asia/Jakarta",
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                }) + " WIB";
+        }
+
+        document.getElementById('year').textContent = new Date().getFullYear();
+        
+        function updateInfoDate(value) {
+            const infoDate = document.getElementById("infoDate");
+            if (!infoDate) return;
+
+            const date = new Date(value);
+            if (isNaN(date)) {
+                infoDate.textContent = "-";
+                return;
+            }
+
+            infoDate.textContent = date.toLocaleDateString("id-ID", {
+                timeZone: "Asia/Jakarta",
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+            });
+        }
+
+        const WEBAPP =
+            "https://script.google.com/macros/s/AKfycbwnsxv605i4E3R7OOF7EdZCcX97o_MyIyB_us5cgEmm_FhUVM6txENGUxMa1UkDd-Qq/exec";
+
+        /* === GLOBAL ELEMENTS === */
+        const loanForm = document.getElementById("loanForm");
+        const transactionDate = document.getElementById("transactionDate");
+        const patientName = document.getElementById("patientName");
+        const staffName = document.getElementById("staffName");
+        const unitSelect = document.getElementById("selectedUnit");
+        const resetFormBtn = document.getElementById("resetForm");
+
+        const infoPatient = document.getElementById("infoPatient");
+        const infoStaff = document.getElementById("infoStaff");
+        const infoUnit = document.getElementById("infoUnit");
+        const infoAlkes = document.getElementById("infoAlkes");
+
+        /* === PACKAGE AUTOCOMPLETE === */
+        const packageInput = document.getElementById("packageInput");
+        const suggestionsBox = document.getElementById("packageSuggestions");
+
+        const packageData = {
+            "infus-dewasa": "Paket Infus Dewasa",
+            "infus-anak": "Paket Infus Anak",
+            "injeksi-lambung": "Paket Injeksi Lambung",
+            "inhalasi-dewasa": "Paket Inhalasi Dewasa",
+            "inhalasi-anak": "Paket Inhalasi Anak",
+            "jahit-luka": "Paket Hecting"
+        };
+
+        // Render suggestion list
+        function showSuggestions(value = "") {
+            suggestionsBox.innerHTML = "";
+
+            const filtered = Object.entries(packageData).filter(([key, label]) =>
+                label.toLowerCase().includes(value.toLowerCase())
+            );
+
+            if (!filtered.length) {
+                suggestionsBox.classList.add("hidden");
+                return;
+            }
+
+            filtered.forEach(([key, label]) => {
+                const item = document.createElement("div");
+                item.className = "px-4 py-2 cursor-pointer hover:bg-blue-50 transition";
+                item.textContent = label;
+
+                item.onclick = () => {
+                    packageInput.value = label;
+                    suggestionsBox.classList.add("hidden");
+                    addPackageItems(key);
+                };
+
+                suggestionsBox.appendChild(item);
+            });
+
+            suggestionsBox.classList.remove("hidden");
+        }
+
+        // Event Saat klik / focus → tampilkan semua paket
+        if (packageInput) {
+            packageInput.addEventListener("focus", function () {
+                showSuggestions("");
+            });
+
+            packageInput.addEventListener("input", function () {
+                showSuggestions(this.value);
+            });
+        }
+
+        // Klik di luar → tutup dropdown
+        document.addEventListener("click", function (e) {
+            if (!e.target.closest("#packageInput")) {
+                if (suggestionsBox) suggestionsBox.classList.add("hidden");
+            }
+        });
+
+        /* === ADD PACKAGE ALKES === */
+        function addPackageItems(packageType) {
+            const container = document.getElementById("alkesContainer");
+            if (!container) return;
+
+            container.innerHTML = "";
+
+            const packages = {
+                "infus-dewasa": [
+                    { name: "Abbocath 22", qty: 1 },
+                    { name: "Abbocath 20", qty: 1 },
+                    { name: "Macro Set", qty: 1 },
+                    { name: "NaCl 0,9% 500 ml", qty: 1 },
+                ],
+                "infus-anak": [
+                    { name: "Abbocath 24", qty: 1 },
+                    { name: "Abbocath 26", qty: 1 },
+                    { name: "Macro Set", qty: 1 },
+                    { name: "Spalk Anak", qty: 1 },
+                    { name: "Kaen 3B 500 ml", qty: 1 },
+                ],
+                "injeksi-lambung": [
+                    { name: "Abbocath 22", qty: 1 },
+                    { name: "Macro Set", qty: 1 },
+                    { name: "Omeprazole 40 mg IV", qty: 1 },
+                    { name: "Ondansetron 4 mg IV", qty: 1 },
+                    { name: "Spuit 5 ml", qty: 1 },
+                    { name: "Spuit 3 ml", qty: 1 },
+                ],
+                "inhalasi-dewasa": [
+                    { name: "Nebulizer Mask Dewasa", qty: 1 },
+                    { name: "Spuit 5 ml", qty: 1 },
+                    { name: "Meprovent", qty: 1 },
+                    { name: "Pulmicort", qty: 1 },
+                ],
+                "inhalasi-anak": [
+                    { name: "Nebulizer Mask Anak", qty: 1 },
+                    { name: "Spuit 5 ml", qty: 1 },
+                    { name: "Meprovent", qty: 1 },
+                    { name: "Pulmicort", qty: 1 },
+                ],
+                "jahit-luka": [
+                    { name: "Lidocain IV", qty: 2 },
+                    { name: "Spuit 3 ml", qty: 1 },
+                    { name: "Polypropilen 3/0 TS 27", qty: 1 },
+                    { name: "Underpad", qty: 1 },
+                    { name: "Daryantul", qty: 1 },
+                    { name: "NaCl 0,9% 500 ml", qty: 1 },
+                ],
+            };
+
+            const items = packages[packageType];
+            if (!items) return;
+
+            items.forEach(item => addAlkesField(item.name, item.qty));
+            updateAlkesInfo();
+        }
+
+        /* === TAMBAH ALKES === */
+        const addAlkesBtn = document.getElementById("addAlkes");
+        if (addAlkesBtn) {
+            addAlkesBtn.addEventListener("click", () => addAlkesField());
+        }
+
+        function addAlkesField(name = "", qty = 1) {
+            const container = document.getElementById("alkesContainer");
+            const id = Date.now();
+
+            const html = `
+                <div class="dynamic-field mb-4 p-4 bg-white border rounded-lg shadow-sm" id="alkes-${id}">
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="md:w-2/3">
+                            <label class="block text-sm mb-1">Nama Alkes</label>
+                            <input type="text" name="alkesName[]" value="${name}" class="alkes-name-input w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="md:w-1/4">
+                            <label class="block text-sm mb-1">Jumlah</label>
+                            <div class="flex">
+                                <button type="button" class="decrease-qty p-3 bg-gray-200 rounded-l hover:bg-gray-300 transition">-</button>
+                                <input type="number" name="alkesQty[]" value="${qty}" min="1" class="alkes-qty-input w-full text-center border-t border-b">
+                                <button type="button" class="increase-qty p-3 bg-gray-200 rounded-r hover:bg-gray-300 transition">+</button>
+                            </div>
+                        </div>
+                        <div class="md:w-1/12 flex items-end">
+                            <button type="button" class="remove-alkes p-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition">🗑</button>
+                        </div>
+                    </div>
+                </div>`;
+
+            container.insertAdjacentHTML("afterbegin", html);
+            const field = document.getElementById(`alkes-${id}`);
+
+            field.querySelector(".remove-alkes").onclick = () => {
+                field.remove();
+                updateRemoveButtons();
+                updateAlkesInfo();
+            };
+
+            field.querySelector(".increase-qty").onclick = () => {
+                const input = field.querySelector(".alkes-qty-input");
+                input.value = parseInt(input.value) + 1;
+                updateAlkesInfo();
+            };
+
+            field.querySelector(".decrease-qty").onclick = () => {
+                const input = field.querySelector(".alkes-qty-input");
+                if (input.value > 1) input.value--;
+                updateAlkesInfo();
+            };
+
+            field.querySelector(".alkes-name-input").oninput = updateAlkesInfo;
+            field.querySelector(".alkes-qty-input").oninput = updateAlkesInfo;
+
+            updateRemoveButtons();
+            updateAlkesInfo();
+        }
+
+        function updateRemoveButtons() {
+            const fields = document.querySelectorAll(".dynamic-field");
+            document.querySelectorAll(".remove-alkes").forEach((btn) => {
+                btn.disabled = fields.length === 1;
+                btn.classList.toggle("opacity-50", fields.length === 1);
+            });
+        }
+
+        /* === INFO PANEL === */
+        function updateAlkesInfo() {
+            const list = infoAlkes;
+            const names = document.querySelectorAll(".alkes-name-input");
+            const qtys = document.querySelectorAll(".alkes-qty-input");
+
+            list.innerHTML = "";
+            names.forEach((n, i) => {
+                if (!n.value.trim()) return;
+                list.innerHTML += `<li class="flex justify-between bg-white p-2 rounded border">
+                    <span>${n.value}</span>
+                    <span class="px-2 bg-blue-100 rounded">${qtys[i].value}</span>
+                </li>`;
+            });
+
+            if (!list.innerHTML)
+                list.innerHTML = '<li class="italic text-gray-500">Belum ada data</li>';
+        }
+
+        /* === RESET === */
+        function performFormReset() {
+            loanForm.reset();
+
+            const today = new Date().toISOString().split("T")[0];
+            transactionDate.value = today;
+            updateInfoDate(today);
+
+            unitSelect.value = "";
+            infoUnit.textContent = "-";
+            infoStaff.textContent = "-";
+            infoPatient.textContent = "-";
+
+            document.getElementById("alkesContainer").innerHTML = "";
+            addAlkesField();
+            updateAlkesInfo();
+        }
+
+        if (resetFormBtn) {
+            resetFormBtn.onclick = () => {
+                Swal.fire({
+                    title: "Reset Form?",
+                    text: "Apakah Anda yakin ingin mereset form? Semua data akan hilang.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#ef4444",
+                    confirmButtonText: "Ya, Reset!",
+                    cancelButtonText: "Batal",
+                    reverseButtons: true,
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        performFormReset();
+                        Swal.fire({
+                            title: "Berhasil!",
+                            text: "Form telah direset",
+                            icon: "success",
+                            timer: 1200,
+                            showConfirmButton: false,
+                        });
+                    }
+                });
+            };
+        }
+
+        /* === CREATE === */
+        if (loanForm) {
+            loanForm.onsubmit = (e) => {
+                e.preventDefault();
+
+                const alkes = [];
+                document.querySelectorAll(".alkes-name-input").forEach((el, i) => {
+                    const name = el.value.trim();
+                    const qty = document.querySelectorAll(".alkes-qty-input")[i].value;
+                    if (name) alkes.push({ name, qty });
+                });
+
+                if (
+                    !patientName.value ||
+                    !unitSelect.value ||
+                    !staffName.value ||
+                    !alkes.length
+                ) {
+                    Swal.fire("Data belum lengkap", "", "warning");
+                    return;
+                }
+
+                Swal.fire({
+                    title: "Simpan Transaksi?",
+                    text: "Data akan disimpan di Google Sheets",
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonText: "Ya, Simpan",
+                    cancelButtonText: "Batal",
+                    reverseButtons: true,
+                    confirmButtonColor: "#3b82f6",
+                    showLoaderOnConfirm: true,
+                    allowEscapeKey: false,
+                    allowOutsideClick: () => !Swal.isLoading(),
+
+                    preConfirm: () => {
+                        return fetch(WEBAPP, {
+                            method: "POST",
+                            body: JSON.stringify({
+                                action: "create",
+                                tanggal: transactionDate.value,
+                                namaPasien: patientName.value,
+                                unit: unitSelect.value,
+                                petugas: staffName.value,
+                                alkes,
+                            }),
+                        })
+                            .then((response) => {
+                                if (!response.ok) throw new Error("Gagal menyimpan");
+                                return response.json();
+                            })
+                            .catch((error) => {
+                                Swal.showValidationMessage(`Error: ${error}`);
+                            });
+                    },
+                }).then((result) => {
+                    if (!result.isConfirmed) return;
+
+                    const res = result.value;
+
+                    if (res.status === "success") {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Berhasil",
+                            text: "Jangan lupa resepin di Khanza ya!",
+                            confirmButtonText: "OK",
+                        }).then(() => {
+                            performFormReset();
+                            loadHistory();
+                        });
+                    } else {
+                        Swal.fire("Error", res.message || "Gagal menyimpan data", "error");
+                    }
+                });
+            };
+        }
+
+        /* === EDIT === */
+        function editData(id, currentStatus = "Belum") {
+            const statusBaru = currentStatus.toLowerCase() === "sudah" ? "Belum" : "Sudah";
+            const teksKonfirmasi = statusBaru === "Sudah"
+                ? "Tandai data ini sebagai Sudah Terinput?"
+                : "Batalkan status Sudah Terinput?";
+
+            Swal.fire({
+                title: "Ubah Status Verifikasi",
+                text: teksKonfirmasi,
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "Ya",
+                cancelButtonText: "Batal",
+                confirmButtonColor: statusBaru === "Sudah" ? "#16a34a" : "#dc2626",
+                reverseButtons: true,
+                showLoaderOnConfirm: true,
+                allowOutsideClick: () => !Swal.isLoading(),
+
+                preConfirm: async () => {
+                    try {
+                        const res = await fetch(WEBAPP, {
+                            method: "POST",
+                            body: JSON.stringify({
+                                action: "updateVerifikasi",
+                                id: id,
+                                verifikasi: statusBaru,
+                            }),
+                        });
+
+                        if (!res.ok) throw new Error("Server tidak merespon");
+
+                        const data = await res.json();
+                        if (data.status !== "success") {
+                            throw new Error(data.message || "Gagal update");
+                        }
+
+                        return data;
+                    } catch (err) {
+                        Swal.showValidationMessage(`Error: ${err.message}`);
+                    }
+                },
+            }).then((result) => {
+                if (!result.isConfirmed) return;
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Berhasil",
+                    text: `Status diubah menjadi ${statusBaru}`,
+                    timer: 1200,
+                    showConfirmButton: false,
+                });
+
+                loadHistory();
+            });
+        }
+
+        /* === DELETE === */
+        function deleteData(id) {
+            Swal.fire({
+                title: "Hapus data?",
+                text: "Data yang dihapus tidak dapat dikembalikan",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Ya, Hapus",
+                cancelButtonText: "Batal",
+                reverseButtons: true,
+                confirmButtonColor: "#ef4444",
+                allowEscapeKey: false,
+                showLoaderOnConfirm: true,
+                allowOutsideClick: () => !Swal.isLoading(),
+
+                preConfirm: () => {
+                    return fetch(WEBAPP, {
+                        method: "POST",
+                        body: JSON.stringify({ action: "delete", id }),
+                    })
+                        .then((res) => {
+                            if (!res.ok) throw new Error("Gagal menghapus");
+                            return res.json();
+                        })
+                        .catch((err) => {
+                            Swal.showValidationMessage(`Error: ${err.message}`);
+                        });
+                },
+            }).then((result) => {
+                if (!result.isConfirmed) return;
+
+                const res = result.value;
+
+                if (res.status === "success") {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Terhapus",
+                        text: "Data berhasil dihapus",
+                        confirmButtonText: "OK",
+                    });
+                    loadHistory();
+                } else {
+                    Swal.fire("Error", res.message || "Gagal menghapus data", "error");
+                }
+            });
+        }
+
+        /* === READ === */
+        function formatTanggalIndonesia(tanggalString) {
+            const date = new Date(tanggalString);
+            if (isNaN(date)) return tanggalString;
+            return date.toLocaleDateString("id-ID", {
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+            });
+        }
+
+        function loadHistory() {
+            fetch(WEBAPP, {
+                method: "POST",
+                body: JSON.stringify({ action: "read" }),
+            })
+                .then((res) => res.json())
+                .then((res) => {
+                    const historyList = document.getElementById("historyList");
+                    if (!historyList) return;
+                    
+                    historyList.innerHTML = "";
+
+                    if (res.status !== "success" || !res.data.length) {
+                        historyList.innerHTML = `
+                            <div class="text-center py-8 text-gray-500">
+                                <i class="fas fa-clipboard-list text-3xl mb-3"></i>
+                                <p>Belum ada transaksi</p>
+                                <p class="text-sm">Data otomatis ditarik dari Google Sheet</p>
+                            </div>`;
+                        return;
+                    }
+
+                    res.data
+                        .sort((a, b) => new Date(b.timestamp || b.tanggal) - new Date(a.timestamp || a.tanggal))
+                        .forEach((trx) => {
+                            const sudah = (trx.verifikasi || "").toLowerCase() === "sudah";
+                            const card = document.createElement("div");
+                            card.className = sudah
+                                ? "p-4 rounded border bg-green-50 border-green-200"
+                                : "p-4 rounded border bg-white border-gray-200";
+
+                            const tanggalFormatted = formatTanggalIndonesia(trx.tanggal);
+
+                            let jamFormatted = "";
+                            if (trx.timestamp) {
+                                const d = new Date(trx.timestamp);
+                                if (!isNaN(d)) {
+                                    jamFormatted = d.toLocaleTimeString("id-ID", {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                    });
+                                }
+                            }
+
+                            const badge = sudah
+                                ? `<span onclick="editData('${trx.id}','Sudah')" class="cursor-pointer text-xs px-2 py-1 bg-green-100 text-green-700 rounded">Sudah Terinput</span>`
+                                : `<span onclick="editData('${trx.id}','Belum')" class="cursor-pointer text-xs px-2 py-1 bg-red-100 text-red-700 rounded">Belum Terinput</span>`;
+
+                            let alkesHTML = '<ul class="list-disc ml-5 text-lg md:text-sm mt-2">';
+                            if (Array.isArray(trx.alkes) && trx.alkes.length) {
+                                trx.alkes.forEach((item) => {
+                                    alkesHTML += `<li>${item.name} <span class="font-semibold">= ${item.qty} pcs</span></li>`;
+                                });
+                            } else {
+                                alkesHTML += '<li class="italic text-gray-500">Tidak ada data alkes</li>';
+                            }
+                            alkesHTML += "</ul>";
+
+                            card.innerHTML = `
+                                <div class="text-sm text-gray-500">
+                                    ${tanggalFormatted}${jamFormatted ? " , jam " + jamFormatted : ""}
+                                </div>
+                                <span class="font-semibold">Nama Pasien : ${trx.namaPasien || "-"}</span><br>
+                                ${trx.petugas || "-"} - ${trx.unit || "-"}<br>
+                                <div class="mt-2">
+                                    <span class="text-lg text-gray-700"><strong>Alkes Dipinjam:</strong></span>
+                                    ${alkesHTML}
+                                </div>
+                                <div class="mt-2 flex justify-between items-center">
+                                    <button onclick="deleteData('${trx.id}')" class="invisible text-red-600 hover:text-red-800 text-sm">
+                                        <i class="fas fa-trash mr-1"></i>Hapus
+                                    </button>
+                                    ${badge}
+                                </div>
+                            `;
+                            historyList.appendChild(card);
+                        });
+                })
+                .catch(() => {
+                    const historyList = document.getElementById("historyList");
+                    if (historyList) {
+                        historyList.innerHTML = `<div class="text-center text-red-500">Gagal terhubung ke server</div>`;
+                    }
+                });
+        }
+
+        /* === INIT === */
+        document.addEventListener("DOMContentLoaded", () => {
+            const today = new Date().toISOString().split("T")[0];
+
+            if (transactionDate) {
+                transactionDate.value = today;
+                updateInfoDate(today);
+            }
+
+            addAlkesField();
+            loadHistory();
+
+            updateNowDateTime();
+            setInterval(updateNowDateTime, 1000);
+
+            if (patientName) {
+                patientName.oninput = (e) => {
+                    if (infoPatient) infoPatient.textContent = e.target.value || "-";
+                };
+            }
+
+            if (staffName) {
+                staffName.oninput = (e) => {
+                    if (infoStaff) infoStaff.textContent = e.target.value || "-";
+                };
+            }
+
+            if (unitSelect) {
+                unitSelect.onchange = (e) => {
+                    if (infoUnit) infoUnit.textContent = e.target.value || "-";
+                };
+            }
+
+            if (transactionDate) {
+                transactionDate.onchange = (e) => updateInfoDate(e.target.value);
+            }
+        });
+    </script>
+</body>
+
+</html>
